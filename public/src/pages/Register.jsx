@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { registerROute } from "../utils/ApiRoutes";
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,7 +33,7 @@ const Register = () => {
         message: "Password should be greater or equal to 8 characters",
       };
     if (email == "") return { stat: false, message: "Email is required" };
-    return { stat: false };
+    return { stat: true };
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,12 +47,29 @@ const Register = () => {
         theme: "dark",
       });
     } else if (stat) {
+      console.log("validated", registerROute);
       const { password, cpassword, username, email } = formData;
-      const { data } = await axios.post(registerROute, {
-        username,
-        email,
-        password,
+      const result = await fetch(registerROute, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
       });
+      const data = await result.json();
+      if (!data.status) {
+        toast.error(data.msg, {
+          position: "bottom-right",
+          autoClose: 8000,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark",
+        });
+      }
+      if (data.status) {
+        localStorage.setItem("chat-app-user", JSON.stringify(data.user));
+      }
+      navigate("/");
     }
   };
 
