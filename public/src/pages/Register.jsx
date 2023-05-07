@@ -1,15 +1,62 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.svg";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { registerROute } from "../utils/ApiRoutes";
 const Register = () => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("form");
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    cpassword: "",
+  });
+
+  const handleValidation = () => {
+    const { password, cpassword, username, email } = formData;
+    if (password !== cpassword)
+      return {
+        stat: false,
+        message: "password and confirm password should be same",
+      };
+    if (username.length < 3)
+      return {
+        stat: false,
+        message: "Username should be greater than 3 characters",
+      };
+    if (password.length < 8)
+      return {
+        stat: false,
+        message: "Password should be greater or equal to 8 characters",
+      };
+    if (email == "") return { stat: false, message: "Email is required" };
+    return { stat: false };
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { stat, message } = handleValidation();
+    if (!stat) {
+      toast.error(message, {
+        position: "bottom-right",
+        autoClose: 8000,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
+    } else if (stat) {
+      const { password, cpassword, username, email } = formData;
+      const { data } = await axios.post(registerROute, {
+        username,
+        email,
+        password,
+      });
+    }
+  };
+
   const handleChange = (e) => {
-    console.log(e);
+    setFormData((data) => ({ ...data, [e.target.name]: e.target.value }));
   };
   return (
     <React.Fragment>
@@ -26,7 +73,7 @@ const Register = () => {
             onChange={handleChange}
           />
           <input
-            type="text"
+            type="email"
             placeholder="Email"
             name="email"
             onChange={handleChange}
@@ -49,6 +96,7 @@ const Register = () => {
           </span>
         </form>
       </FormContainer>
+      <ToastContainer />
     </React.Fragment>
   );
 };
@@ -97,7 +145,7 @@ const FormContainer = styled.div`
     }
   }
   button {
-    background-color: #4e0eff;
+    background-color: #997af0;
     color: white;
     padding: 1rem 2rem;
     border: none;
@@ -106,6 +154,7 @@ const FormContainer = styled.div`
     border-radius: 0.4rem;
     font-size: 1rem;
     text-transform: uppercase;
+    transition: 0.5s ease-in-out;
     &:hover {
       background-color: #4e0eff;
     }
