@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import loader from "../assets/loader.gif";
@@ -15,6 +15,7 @@ const SetAvatar = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [avatarsLoaded, setAvatarsLoaded] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState(undefined);
+  const [buttonText, setButtonText] = useState("Load Avatars");
   const toastOptions = {
     position: "bottom-right",
     autoClose: 8000,
@@ -22,7 +23,11 @@ const SetAvatar = () => {
     draggable: true,
     theme: "dark",
   };
-  const setProfilePicture = async () => {};
+  const setProfilePicture = async () => {
+    setButtonText((text) =>
+      text === "Load Avatars" ? "Set as Profile picture" : "Load Avatars"
+    );
+  };
   useEffect(() => {
     const data = [];
     for (let i = 0; i < 4; i++) {
@@ -35,7 +40,7 @@ const SetAvatar = () => {
           });
           reader.readAsDataURL(image);
           if (i === 3) {
-            console.log(" iam here")
+            console.log("ok i dont need caching")
             setAvatarsLoaded(true);
           }
         })
@@ -56,7 +61,6 @@ const SetAvatar = () => {
             <h1>Pick an Avatar as your profile picture</h1>
           </div>
           <div className="avatars">
-            {console.log(avatars)}
             {avatarsLoaded ? (
               avatars.map((avatar, index) => {
                 return (
@@ -82,7 +86,7 @@ const SetAvatar = () => {
             )}
           </div>
           <button onClick={setProfilePicture} className="submit-btn">
-            Set as Profile Picture
+            {buttonText}
           </button>
           <ToastContainer />
         </Container>
