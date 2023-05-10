@@ -24,9 +24,29 @@ const SetAvatar = () => {
     theme: "dark",
   };
   const setProfilePicture = async () => {
-    setButtonText((text) =>
-      text === "Load Avatars" ? "Set as Profile picture" : "Load Avatars"
-    );
+    if (buttonText === "Load Avatars") {
+      setButtonText("Set Profile picture");
+    } else {
+      if (selectedAvatar === undefined) {
+        toast.error("Please select an avatar", toastOptions);
+      } else {
+        const user = await JSON.parse(localStorage.getItem("chat-app-user"));
+        const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
+          image: avatars[selectedAvatar],
+        });
+        if (data.isSet) {
+          user.isAvatarImageSet = true;
+          user.avatarImage = data.image;
+          localStorage.setItem("chat-app-user", JSON.stringify(user));
+          navigate("/");
+        } else {
+          toast.error(
+            "Error setting avatar, please try again or later",
+            toastOptions
+          );
+        }
+      }
+    }
   };
   useEffect(() => {
     const data = [];
@@ -40,7 +60,7 @@ const SetAvatar = () => {
           });
           reader.readAsDataURL(image);
           if (i === 3) {
-            console.log("ok i dont need caching")
+            console.log("ok i dont need caching");
             setAvatarsLoaded(true);
           }
         })

@@ -36,9 +36,25 @@ module.exports.login = async (req, res, next) => {
       return res.json({ msg: "Incorrect username or password", status: false })
     }
     delete dbUser.password;
-    return res.json({ status: true, user:dbUser })
+    return res.json({ status: true, user: dbUser })
   } catch (err) {
     next(err);
     res.status(500).json({ status: false, msg: err });
+  }
+};
+module.exports.setAvatar = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { image } = req.body;
+    const userData = await USER.findByIdAndUpdate({ _id: id }, {
+      $set: {
+        isAvatarImageSet: true,
+        avatarImage: image
+      }
+    })
+    return res.json({ isSet: true, image: userData.avatarImage })
+  } catch (err) {
+    next(err);
+    res.status(500).json({ isSet: false, msg: err });
   }
 };
