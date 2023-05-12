@@ -23,6 +23,11 @@ const SetAvatar = () => {
     draggable: true,
     theme: "dark",
   };
+  useEffect(()=>{
+    if(!localStorage.getItem("chat-app-user")){
+      navigate("/login")
+    }
+  },[])
   const setProfilePicture = async () => {
     if (buttonText === "Load Avatars") {
       setButtonText("Set Profile picture");
