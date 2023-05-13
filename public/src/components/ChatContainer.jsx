@@ -2,10 +2,11 @@ import React from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
+import Messages from "./Messages";
 const ChatContainer = ({ currentChat }) => {
-    const handleSubmit =async (e)=>{
-
-    }
+  const handleSubmit = async (message) => {
+    alert(message)
+  };
   return (
     <Container>
       <div className="chat-header">
@@ -18,20 +19,21 @@ const ChatContainer = ({ currentChat }) => {
           </div>
           <Logout />
         </div>
-        <div className="chat-messages"></div>
-        <div className="chat-input">
-            <ChatInput handleSendMessage={handleSubmit}/>
-        </div>
+      </div>
+      <div className="chat-messages">
+        <Messages/>
+      </div>
+      <div className="chat-input">
+        <ChatInput handleSendMessage={handleSubmit} />
       </div>
     </Container>
   );
 };
 
 const Container = styled.div`
-  display: flex;
-  flex-direction:column;
+  display: grid;
+  grid-template-rows: 10% 80% 10%;
   gap: 0.1rem;
-  overflow: hidden;
   @media screen and (min-width: 720px) and (max-width: 1080px) {
     grid-template-rows: 15% 70% 15%;
   }
