@@ -5,7 +5,7 @@ import logo from "../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { registerROute } from "../utils/ApiRoutes";
+import { registerRoute } from "../utils/ApiRoutes";
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -14,6 +14,11 @@ const Register = () => {
     password: "",
     cpassword: "",
   });
+  useEffect(() => {
+    if (localStorage.getItem("chat-app-user")) {
+      navigate("/");
+    }
+  }, []);
 
   const handleValidation = () => {
     const { password, cpassword, username, email } = formData;
@@ -47,9 +52,9 @@ const Register = () => {
         theme: "dark",
       });
     } else if (stat) {
-      console.log("validated", registerROute);
+      console.log("validated", registerRoute);
       const { password, cpassword, username, email } = formData;
-      const result = await fetch(registerROute, {
+      const result = await fetch(registerRoute, {
         method: "POST",
         headers: {
           "Content-type": "application/json",
