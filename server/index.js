@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const { connect } = require("mongoose");
 const userRouter = require("./routes/userRoutes");
+const messageRouter = require("./routes/messageRoutes");
 
 const app = express();
 const PORT = process.env.PORT;
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/auth", userRouter);
+app.use("/api/messages", messageRouter)
 
 connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
