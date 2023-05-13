@@ -4,9 +4,12 @@ import styled from "styled-components";
 import axios from "axios";
 import { allUsersRoute } from "../utils/ApiRoutes";
 import Contacts from "../components/Contacts";
+import Welcome from "../components/Welcome";
+import ChatContainer from "../components/ChatContainer";
 const Chat = () => {
   const [contacts, setContacts] = useState([]);
   const [currentUser, setCurrentsUser] = useState(undefined);
+  const [currentChat, setCurrentChat] = useState(undefined);
   const navigate = useNavigate();
   useEffect(() => {
     const user = localStorage.getItem("chat-app-user");
@@ -16,6 +19,9 @@ const Chat = () => {
       setCurrentsUser(JSON.parse(user));
     }
   }, []);
+  const handleChatChange = (chat) => {
+    setCurrentChat(chat);
+  };
   useEffect(() => {
     if (currentUser) {
       if (currentUser.isAvatarImageSet) {
@@ -31,7 +37,16 @@ const Chat = () => {
     <>
       <Container>
         <div className="container">
-          <Contacts contacts={contacts} currentUser={currentUser} />
+          <Contacts
+            contacts={contacts}
+            currentUser={currentUser}
+            changeChat={handleChatChange}
+          />
+          {currentChat === undefined ? (
+            <Welcome user={currentUser} />
+          ) : (
+            <ChatContainer currentChat={currentChat} />
+          )}
         </div>
       </Container>
     </>
