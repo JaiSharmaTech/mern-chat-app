@@ -4,6 +4,7 @@ const cors = require("cors");
 const { connect } = require("mongoose");
 const userRouter = require("./routes/userRoutes");
 const messageRouter = require("./routes/messageRoutes");
+const socket = require("socket.io")
 
 const app = express();
 const PORT = process.env.PORT;
@@ -34,3 +35,25 @@ connect(process.env.MONGO_URL, {
 const server = app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });
+
+const io = socket(server,{
+  cors:{
+    origin:"*",
+    credentials:true,
+  }
+})
+
+global.onlineUsers = new Map();
+
+io.on("connection",socket=>{
+  global.chatSocket = socket;
+  socket.on("add-user",(userId)=>{
+    onlineUsers.set(userId, socket.id)
+  })
+  socket.on("send-msg",data=>{
+    const sendUserSocket = onlineUsers.get(data.to)
+    if(sendUserSocket){
+      socket.to(sendUserSocket).emit("msg-recieved",data.message)
+    }
+  })
+})

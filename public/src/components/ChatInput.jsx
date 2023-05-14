@@ -9,8 +9,8 @@ const ChatInput = ({ handleSendMessage }) => {
   const handleEmojiPickerHideShow = () => {
     setShowEmojiPicker((curr) => !curr);
   };
-  const handleEmojiClick = (e) => {
-    setMessage((msg) => msg + e.emoji);
+  const handleEmojiClick = (e, emoji) => {
+    setMessage((msg) => msg + emoji.emoji);
   };
   const sendChat = (e) => {
     e.preventDefault();
@@ -70,9 +70,9 @@ const Container = styled.div`
         color: #ffff00c8;
         cursor: pointer;
       }
-      .EmojiPickerReact {
+      .emoji-picker {
         position: absolute;
-        top: -480px;
+        top: -330px;
         background-color: #080420;
         box-shadow: 0 5px 10px #9a86f3;
         border-color: #9a86f3;

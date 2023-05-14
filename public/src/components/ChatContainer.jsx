@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
 import { getMessageRoute, sendMessageRoute } from "../utils/ApiRoutes";
 import axios from "axios";
-const ChatContainer = ({ currentChat, currentUser }) => {
+const ChatContainer = ({ currentChat, currentUser, socket }) => {
   const [messages, setMessages] = useState([]);
+  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const scrollRef = useRef();
   useEffect(() => {
     axios
       .post(getMessageRoute, {
@@ -22,7 +24,32 @@ const ChatContainer = ({ currentChat, currentUser }) => {
       to: currentChat?._id,
       message,
     });
+    socket.current.emit("send-msg", {
+      to: currentChat._id,
+      from: currentUser._id,
+      message,
+    });
+
+    const msgs = [...messages];
+    msgs.push({ fromSelf: true, message });
+    setMessages(msgs);
   };
+
+  useEffect(() => {
+    if (socket.current) {
+      socket.current.on("msg-recieved", (message) => {
+        setArrivalMessage({ fromSelf: false, message });
+      });
+    }
+  }, []);
+  useEffect(() => {
+    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
+  }, [arrivalMessage]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <Container>
       <div className="chat-header">
@@ -37,9 +64,9 @@ const ChatContainer = ({ currentChat, currentUser }) => {
         </div>
       </div>
       <div className="chat-messages">
-        {messages.map((message) => {
+        {messages.map((message, index) => {
           return (
-            <div>
+            <div key={index}>
               <div
                 className={`message ${
                   message.fromSelf ? "sended" : "recieved"
@@ -64,6 +91,7 @@ const Container = styled.div`
   display: grid;
   grid-template-rows: 10% 80% 10%;
   gap: 0.1rem;
+  overflow: hidden;
   @media screen and (min-width: 720px) and (max-width: 1080px) {
     grid-template-rows: 15% 70% 15%;
   }
