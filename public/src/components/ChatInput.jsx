@@ -15,6 +15,7 @@ const ChatInput = ({ handleSendMessage }) => {
   const sendChat = (e) => {
     e.preventDefault();
     if (message.length > 0) {
+      setMessage("");
       handleSendMessage(message);
     }
   };
@@ -35,7 +36,9 @@ const ChatInput = ({ handleSendMessage }) => {
           type="text"
           placeholder="type your message here"
           value={message}
-          onClick={handleEmojiPickerHideShow}
+          onClick={() => {
+            setShowEmojiPicker(false);
+          }}
           onChange={(e) => setMessage(e.target.value)}
         />
         <button type="submit">

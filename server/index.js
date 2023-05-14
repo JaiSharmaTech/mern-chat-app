@@ -31,6 +31,6 @@ connect(process.env.MONGO_URL, {
     console.log(`Error: ${err.message}`);
   });
 
-const server = app.listen(PORT, (err) => {
+const server = app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });

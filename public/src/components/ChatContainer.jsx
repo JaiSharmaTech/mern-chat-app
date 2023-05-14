@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
-import Messages from "./Messages";
-const ChatContainer = ({ currentChat }) => {
+import { getMessageRoute, sendMessageRoute } from "../utils/ApiRoutes";
+import axios from "axios";
+const ChatContainer = ({ currentChat, currentUser }) => {
+  const [messages, setMessages] = useState([]);
+  useEffect(() => {
+    axios
+      .post(getMessageRoute, {
+        from: currentUser._id,
+        to: currentChat._id,
+      })
+      .then((msgs) => {
+        setMessages(msgs.data);
+      });
+  }, [currentChat]);
   const handleSubmit = async (message) => {
-    alert(message)
+    await axios.post(sendMessageRoute, {
+      from: currentUser?._id,
+      to: currentChat?._id,
+      message,
+    });
   };
   return (
     <Container>
@@ -21,7 +37,21 @@ const ChatContainer = ({ currentChat }) => {
         </div>
       </div>
       <div className="chat-messages">
-        <Messages/>
+        {messages.map((message) => {
+          return (
+            <div>
+              <div
+                className={`message ${
+                  message.fromSelf ? "sended" : "recieved"
+                }`}
+              >
+                <div className="content">
+                  <p>{message.message}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
       <div className="chat-input">
         <ChatInput handleSendMessage={handleSubmit} />
