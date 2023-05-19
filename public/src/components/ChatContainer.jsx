@@ -5,24 +5,16 @@ import ChatInput from "./ChatInput";
 import { getMessageRoute, sendMessageRoute } from "../utils/ApiRoutes";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentChat, getUser } from "../store/UserSlice";
-import { getMessages } from "../store/messagesSlice";
+import { getMessages, addMessage, getAllMessages } from "../store/messagesSlice";
 import axios from "axios";
 const ChatContainer = ({ currentChat, currentUser, socket }) => {
-  const [messages, setMessages] = useState([]);
+  const messages = useSelector(getAllMessages)
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const scrollRef = useRef();
   const rdUser = useSelector(getUser);
   const rdChat = useSelector(getCurrentChat);
   const dispatch = useDispatch();
   useEffect(() => {
-    axios
-      .post(getMessageRoute, {
-        from: currentUser._id,
-        to: currentChat._id,
-      })
-      .then((msgs) => {
-        setMessages(msgs.data);
-      });
     dispatch(getMessages({ from: rdUser._id, to: rdChat._id }));
   }, [currentChat]);
   const handleSubmit = async (message) => {
@@ -36,10 +28,6 @@ const ChatContainer = ({ currentChat, currentUser, socket }) => {
       from: currentUser._id,
       message,
     });
-
-    const msgs = [...messages];
-    msgs.push({ fromSelf: true, message });
-    setMessages(msgs);
   };
 
   useEffect(() => {
@@ -50,7 +38,8 @@ const ChatContainer = ({ currentChat, currentUser, socket }) => {
     }
   }, []);
   useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
+    // arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
+    arrivalMessage && dispatch(addMessage(arrivalMessage))
   }, [arrivalMessage]);
 
   useEffect(() => {

@@ -22,10 +22,7 @@ const messageSlice = createSlice({
     initialState,
     reducers: {
         addMessage(state, action) {
-            state.push({
-                fromSelf: true,
-                message: action.payload,
-            })
+            state.messages.push(action.payload)
         }
     },
     extraReducers: (builder) => {
@@ -41,14 +38,17 @@ const messageSlice = createSlice({
         })
         builder.addCase(sendMessage.fulfilled, (state, action) => {
             if (action.payload[0].status) {
-                messageSlice.actions.addMessage(action.payload[1].message)
+                messageSlice.actions.addMessage({
+                    fromSelf:true,
+                    message:action.payload[1].message,
+                })
             } else {
                 state.error = action.payload[0].msg;
             }
         })
     }
 })
-
+export const getAllMessages = state=>state.message.messages;
 export const { addMessage } = messageSlice.actions;
 
 export default messageSlice.reducer
