@@ -1,12 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import axios from "axios";
 import { BiPowerOff } from "react-icons/bi";
+import { useDispatch } from "react-redux";
+import { logout } from "../store/UserSlice";
 const Logout = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleClick = async () => {
     localStorage.clear();
+    dispatch(logout())
     navigate("/login");
   };
   return (

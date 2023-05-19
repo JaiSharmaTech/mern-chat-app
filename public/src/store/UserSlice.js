@@ -2,31 +2,44 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { allUsersRoute } from "../utils/ApiRoutes";
 import axios from "axios"
 const initialState = {
-    currentUser:JSON.parse(localStorage.getItem("chat-app-user")) || null,
-    currentChat:{},
-    chatUsers:[],
-    loadedChatUsers:"loading",
-    error:null,
+    currentUser: JSON.parse(localStorage.getItem("chat-app-user")) || null,
+    currentChat: {},
+    chatUsers: [],
+    loadedChatUsers: "loading",
+    error: null,
 }
 
-export const fetchChatUsers = createAsyncThunk('user/fetchChatUsers',async(userId)=>{
-    const {data} = await axios.get(`${allUsersRoute}/${userId}`);
+export const fetchChatUsers = createAsyncThunk('user/fetchChatUsers', async (userId) => {
+    const { data } = await axios.get(`${allUsersRoute}/${userId}`);
     return data;
 })
 
 const usersSlice = createSlice({
-    name:"user",
+    name: "user",
     initialState,
-    extraReducers:(builder)=>{
-        builder.addCase(fetchChatUsers.fulfilled,(state, action)=>{
+    reducers: {
+        setCurrentChat(state, action) {
+            state.currentChat = state.chatUsers[action.payload]
+        },
+        logout(state, action){
+            state.currentUser = null;
+        }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(fetchChatUsers.fulfilled, (state, action) => {
             state.chatUsers = action.payload
             state.loadedChatUsers = "loaded"
         })
-        builder.addCase(fetchChatUsers.rejected,(state, action)=>{
+        builder.addCase(fetchChatUsers.rejected, (state, action) => {
             state.loadedChatUsers = "error"
             state.error = action.error
         })
     }
 })
-
+export const { setCurrentChat, logout } = usersSlice.actions;
+export const getContacts = (state) => state.user.chatUsers;
+export const getCurrentChat = state => state.user.currentChat;
+export const getUser = state => state.user.currentUser;
+export const getError = state => state.user.error;
+export const getStatus = state => state.user.loadedChatUsers;
 export default usersSlice.reducer

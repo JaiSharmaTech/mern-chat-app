@@ -5,6 +5,9 @@ import Chat from "./pages/Chat";
 import SetAvatar from "./pages/SetAvatar";
 import { Provider } from "react-redux";
 import store from "./store/store";
+import { fetchChatUsers } from "./store/UserSlice";
+const currentUser = store.getState().user.currentUser;
+currentUser && store.dispatch(fetchChatUsers(currentUser._id));
 function App() {
   return (
     <Router>
