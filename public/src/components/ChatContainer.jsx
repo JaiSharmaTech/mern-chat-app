@@ -3,11 +3,17 @@ import styled from "styled-components";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
 import { getMessageRoute, sendMessageRoute } from "../utils/ApiRoutes";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentChat, getUser } from "../store/UserSlice";
+import { getMessages } from "../store/messagesSlice";
 import axios from "axios";
 const ChatContainer = ({ currentChat, currentUser, socket }) => {
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const scrollRef = useRef();
+  const rdUser = useSelector(getUser);
+  const rdChat = useSelector(getCurrentChat);
+  const dispatch = useDispatch();
   useEffect(() => {
     axios
       .post(getMessageRoute, {
@@ -17,6 +23,7 @@ const ChatContainer = ({ currentChat, currentUser, socket }) => {
       .then((msgs) => {
         setMessages(msgs.data);
       });
+    dispatch(getMessages({ from: rdUser._id, to: rdChat._id }));
   }, [currentChat]);
   const handleSubmit = async (message) => {
     await axios.post(sendMessageRoute, {
