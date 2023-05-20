@@ -5,12 +5,15 @@ import loader from "../assets/loader.gif";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import Buffer from "buffer";
 import { setAvatarRoute } from "../utils/ApiRoutes";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, updateUser } from "../store/UserSlice";
 
 const SetAvatar = () => {
   const api = "https://api.dicebear.com/6.x/open-peeps/svg?seed=";
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(getUser)
   const [avatars, setAvatars] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [avatarsLoaded, setAvatarsLoaded] = useState(false);
@@ -23,11 +26,11 @@ const SetAvatar = () => {
     draggable: true,
     theme: "dark",
   };
-  useEffect(()=>{
-    if(!localStorage.getItem("chat-app-user")){
-      navigate("/login")
+  useEffect(() => {
+    if (!localStorage.getItem("chat-app-user")) {
+      navigate("/login");
     }
-  },[])
+  }, []);
   const setProfilePicture = async () => {
     if (buttonText === "Load Avatars") {
       setButtonText("Set Profile picture");
@@ -35,14 +38,13 @@ const SetAvatar = () => {
       if (selectedAvatar === undefined) {
         toast.error("Please select an avatar", toastOptions);
       } else {
-        const user = await JSON.parse(localStorage.getItem("chat-app-user"));
         const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
           image: avatars[selectedAvatar],
         });
         if (data.isSet) {
-          user.isAvatarImageSet = true;
-          user.avatarImage = data.image;
-          localStorage.setItem("chat-app-user", JSON.stringify(user));
+          dispatch(
+            updateUser({ isAvatarImageSet: true, avatarImage: data.image })
+          );
           navigate("/");
         } else {
           toast.error(

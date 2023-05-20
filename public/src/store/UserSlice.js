@@ -29,7 +29,7 @@ const usersSlice = createSlice({
             localStorage.setItem('chat-app-user',JSON.stringify(action.payload))
         },
         updateUser(state, action){
-            const newUser = {...state, ...action.payload}
+            const newUser = {...state.currentUser, ...action.payload}
             state.currentUser = newUser;
             localStorage.setItem('chat-app-user',JSON.stringify(newUser))
         }

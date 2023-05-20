@@ -45,6 +45,7 @@ module.exports.login = async (req, res, next) => {
 module.exports.setAvatar = async (req, res, next) => {
   try {
     const { id } = req.params;
+    console.log(id)
     const { image } = req.body;
     const userData = await USER.findByIdAndUpdate({ _id: id }, {
       $set: {
@@ -52,7 +53,7 @@ module.exports.setAvatar = async (req, res, next) => {
         avatarImage: image
       }
     })
-    return res.json({ isSet: true, image: userData.avatarImage })
+    return res.json({ isSet: true, image })
   } catch (err) {
     next(err);
     res.status(500).json({ isSet: false, msg: err });

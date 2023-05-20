@@ -6,8 +6,11 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { loginRoute } from "../utils/ApiRoutes";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/UserSlice";
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -64,7 +67,7 @@ const Login = () => {
         });
       }
       if (data.status) {
-        localStorage.setItem("chat-app-user", JSON.stringify(data.user));
+        dispatch(setUser(data.user))
         navigate("/");
       }
     }
