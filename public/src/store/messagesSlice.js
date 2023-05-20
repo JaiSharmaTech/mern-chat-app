@@ -31,6 +31,7 @@ const messageSlice = createSlice({
         })
         builder.addCase(getMessages.fulfilled, (state, action) => {
             state.messages = action.payload;
+            state.messagesLoaded = "loaded"
         })
         builder.addCase(getMessages.rejected, (state, action) => {
             state.err = action.error
@@ -38,12 +39,12 @@ const messageSlice = createSlice({
         })
         builder.addCase(sendMessage.fulfilled, (state, action) => {
             if (action.payload[0].status) {
-                messageSlice.actions.addMessage({
+                state.messages.push({
                     fromSelf:true,
                     message:action.payload[1].message,
                 })
             } else {
-                state.error = action.payload[0].msg;
+                state.err = action.payload[0].msg;
             }
         })
     }

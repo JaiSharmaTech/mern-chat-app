@@ -2,27 +2,28 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
-import { getMessageRoute, sendMessageRoute } from "../utils/ApiRoutes";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentChat, getUser } from "../store/UserSlice";
-import { getMessages, addMessage, getAllMessages } from "../store/messagesSlice";
-import axios from "axios";
-const ChatContainer = ({ currentChat, currentUser, socket }) => {
-  const messages = useSelector(getAllMessages)
+import {
+  getMessages,
+  addMessage,
+  getAllMessages,
+  sendMessage,
+} from "../store/messagesSlice";
+const ChatContainer = ({ socket }) => {
+  const messages = useSelector(getAllMessages);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const scrollRef = useRef();
-  const rdUser = useSelector(getUser);
-  const rdChat = useSelector(getCurrentChat);
+  const currentUser = useSelector(getUser);
+  const currentChat = useSelector(getCurrentChat);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getMessages({ from: rdUser._id, to: rdChat._id }));
+    dispatch(getMessages({ from: currentUser._id, to: currentChat._id }));
   }, [currentChat]);
   const handleSubmit = async (message) => {
-    await axios.post(sendMessageRoute, {
-      from: currentUser?._id,
-      to: currentChat?._id,
-      message,
-    });
+    dispatch(
+      sendMessage({ from: currentUser?._id, to: currentChat?._id, message })
+    );
     socket.current.emit("send-msg", {
       to: currentChat._id,
       from: currentUser._id,
@@ -38,8 +39,7 @@ const ChatContainer = ({ currentChat, currentUser, socket }) => {
     }
   }, []);
   useEffect(() => {
-    // arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
-    arrivalMessage && dispatch(addMessage(arrivalMessage))
+    arrivalMessage && dispatch(addMessage(arrivalMessage));
   }, [arrivalMessage]);
 
   useEffect(() => {

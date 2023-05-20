@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
-import { setCurrentChat, getUser, getCurrentChat } from "../store/UserSlice";
+import { setCurrentChat, getUser, getContacts } from "../store/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
-export default function Contacts({ contacts, changeChat }) {
+export default function Contacts({ changeChat }) {
+  const contacts = useSelector(getContacts)
   const [currentSelected, setCurrentSelected] = useState(undefined);
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
-    changeChat(contact);
+    // changeChat(contact);
     dispatch(setCurrentChat(index));
   };
   return (

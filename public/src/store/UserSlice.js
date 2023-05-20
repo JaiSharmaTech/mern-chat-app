@@ -3,7 +3,7 @@ import { allUsersRoute } from "../utils/ApiRoutes";
 import axios from "axios"
 const initialState = {
     currentUser: JSON.parse(localStorage.getItem("chat-app-user")) || null,
-    currentChat: {},
+    currentChat: null,
     chatUsers: [],
     loadedChatUsers: "loading",
     error: null,

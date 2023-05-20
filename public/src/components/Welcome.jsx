@@ -1,7 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import Robot from '../assets/robot.gif'
-const Welcome = ({ user }) => {
+import { useSelector } from "react-redux";
+import { getUser } from "../store/UserSlice";
+const Welcome = () => {
+  const user = useSelector(getUser)
   return (
     <Container>
         <img src={Robot} alt="" />
