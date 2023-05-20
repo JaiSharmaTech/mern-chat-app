@@ -21,8 +21,17 @@ const usersSlice = createSlice({
         setCurrentChat(state, action) {
             state.currentChat = state.chatUsers[action.payload]
         },
-        logout(state, action){
+        logout(state){
             state.currentUser = null;
+        },
+        setUser(state, action){
+            state.currentUser = action.payload;
+            localStorage.setItem('chat-app-user',JSON.stringify(action.payload))
+        },
+        updateUser(state, action){
+            const newUser = {...state, ...action.payload}
+            state.currentUser = newUser;
+            localStorage.setItem('chat-app-user',JSON.stringify(newUser))
         }
     },
     extraReducers: (builder) => {
@@ -36,7 +45,7 @@ const usersSlice = createSlice({
         })
     }
 })
-export const { setCurrentChat, logout } = usersSlice.actions;
+export const { setCurrentChat, logout, setUser, updateUser } = usersSlice.actions;
 export const getContacts = (state) => state.user.chatUsers;
 export const getCurrentChat = state => state.user.currentChat;
 export const getUser = state => state.user.currentUser;
