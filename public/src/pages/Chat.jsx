@@ -1,41 +1,35 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import axios from "axios";
-import { allUsersRoute, host } from "../utils/ApiRoutes";
+import { host } from "../utils/ApiRoutes";
 import Contacts from "../components/Contacts";
 import Welcome from "../components/Welcome";
 import ChatContainer from "../components/ChatContainer";
 import { io } from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchChatUsers, getCurrentChat, getUser } from "../store/UserSlice";
+
 const Chat = () => {
   const socket = useRef();
-  const [contacts, setContacts] = useState([]);
-  const [currentUser, setCurrentsUser] = useState(undefined);
-  const [currentChat, setCurrentChat] = useState(undefined);
+  const dispatch = useDispatch();
+  const currentUser = useSelector(getUser)
+  const currentChat = useSelector(getCurrentChat)
   const navigate = useNavigate();
   useEffect(() => {
-    const user = localStorage.getItem("chat-app-user");
-    if (!user) {
-      navigate("/login");
-    } else {
-      setCurrentsUser(JSON.parse(user));
+    if(!currentUser){
+      navigate("/login")
     }
   }, []);
-  useEffect(()=>{
-    if(currentUser){
+  useEffect(() => {
+    if (currentUser) {
       socket.current = io(host);
-      socket.current.emit("add-user",currentUser._id);
+      socket.current.emit("add-user", currentUser._id);
     }
-  },[currentUser])
-  const handleChatChange = (chat) => {
-    setCurrentChat(chat);
-  };
+  }, [currentUser]);
   useEffect(() => {
     if (currentUser) {
       if (currentUser.isAvatarImageSet) {
-        axios.get(`${allUsersRoute}/${currentUser._id}`).then(({ data }) => {
-          setContacts(data);
-        });
+        dispatch(fetchChatUsers(currentUser._id))
       } else {
         navigate("/setAvatar");
       }
@@ -45,19 +39,11 @@ const Chat = () => {
     <>
       <Container>
         <div className="container">
-          <Contacts
-            contacts={contacts}
-            currentUser={currentUser}
-            changeChat={handleChatChange}
-          />
-          {currentChat === undefined ? (
-            <Welcome user={currentUser} />
+          <Contacts />
+          {!currentChat ? (
+            <Welcome />
           ) : (
-            <ChatContainer
-            socket={socket}
-              currentUser={currentUser}
-              currentChat={currentChat}
-            />
+            <ChatContainer socket={socket} />
           )}
         </div>
       </Container>

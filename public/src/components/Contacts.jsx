@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import Logo from "../assets/logo.svg";
-
-export default function Contacts({ contacts, changeChat }) {
-  const [currentUserName, setCurrentUserName] = useState(undefined);
-  const [currentUserImage, setCurrentUserImage] = useState(undefined);
+import { setCurrentChat, getUser, getContacts } from "../store/UserSlice";
+import { useDispatch, useSelector } from "react-redux";
+export default function Contacts({ changeChat }) {
+  const contacts = useSelector(getContacts)
   const [currentSelected, setCurrentSelected] = useState(undefined);
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("chat-app-user"));
-    setCurrentUserName(data?.username);
-    setCurrentUserImage(data?.avatarImage);
-  }, []);
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
-    changeChat(contact);
+    // changeChat(contact);
+    dispatch(setCurrentChat(index));
   };
   return (
     <>
-      {currentUserImage && currentUserImage && (
+      {user && (
         <Container>
           <div className="brand">
             <img src={Logo} alt="logo" />
@@ -45,10 +43,10 @@ export default function Contacts({ contacts, changeChat }) {
           </div>
           <div className="current-user">
             <div className="avatar">
-              <img src={currentUserImage} alt="avatar" />
+              <img src={user.avatarImage} alt="avatar" />
             </div>
             <div className="username">
-              <h2>{currentUserName}</h2>
+              <h2>{user.username}</h2>
             </div>
           </div>
         </Container>

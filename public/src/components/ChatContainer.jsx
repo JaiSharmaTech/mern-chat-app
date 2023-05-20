@@ -2,37 +2,33 @@ import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import Logout from "./Logout";
 import ChatInput from "./ChatInput";
-import { getMessageRoute, sendMessageRoute } from "../utils/ApiRoutes";
-import axios from "axios";
-const ChatContainer = ({ currentChat, currentUser, socket }) => {
-  const [messages, setMessages] = useState([]);
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentChat, getUser } from "../store/UserSlice";
+import {
+  getMessages,
+  addMessage,
+  getAllMessages,
+  sendMessage,
+} from "../store/messagesSlice";
+const ChatContainer = ({ socket }) => {
+  const messages = useSelector(getAllMessages);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const scrollRef = useRef();
+  const currentUser = useSelector(getUser);
+  const currentChat = useSelector(getCurrentChat);
+  const dispatch = useDispatch();
   useEffect(() => {
-    axios
-      .post(getMessageRoute, {
-        from: currentUser._id,
-        to: currentChat._id,
-      })
-      .then((msgs) => {
-        setMessages(msgs.data);
-      });
+    dispatch(getMessages({ from: currentUser._id, to: currentChat._id }));
   }, [currentChat]);
   const handleSubmit = async (message) => {
-    await axios.post(sendMessageRoute, {
-      from: currentUser?._id,
-      to: currentChat?._id,
-      message,
-    });
+    dispatch(
+      sendMessage({ from: currentUser?._id, to: currentChat?._id, message })
+    );
     socket.current.emit("send-msg", {
       to: currentChat._id,
       from: currentUser._id,
       message,
     });
-
-    const msgs = [...messages];
-    msgs.push({ fromSelf: true, message });
-    setMessages(msgs);
   };
 
   useEffect(() => {
@@ -43,7 +39,7 @@ const ChatContainer = ({ currentChat, currentUser, socket }) => {
     }
   }, []);
   useEffect(() => {
-    arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
+    arrivalMessage && dispatch(addMessage(arrivalMessage));
   }, [arrivalMessage]);
 
   useEffect(() => {

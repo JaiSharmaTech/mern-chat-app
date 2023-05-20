@@ -4,10 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 import { registerRoute } from "../utils/ApiRoutes";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/UserSlice";
 const Register = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -53,7 +55,7 @@ const Register = () => {
       });
     } else if (stat) {
       console.log("validated", registerRoute);
-      const { password, cpassword, username, email } = formData;
+      const { password, username, email } = formData;
       const result = await fetch(registerRoute, {
         method: "POST",
         headers: {
@@ -72,7 +74,7 @@ const Register = () => {
         });
       }
       if (data.status) {
-        localStorage.setItem("chat-app-user", JSON.stringify(data.user));
+        dispatch(setUser(data.user))
       }
       navigate("/");
     }
